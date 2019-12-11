@@ -3,21 +3,27 @@
 #include <LOLIN_HP303B.h>
 #include <PubSubClient.h>
 
+//This sketch is to publish Temperature and Humidity from a SHT30 to an MQTT Server. This also publishes so Home Assistant's MQTT Auto Discover will work well.
+//This sketch also publishes for pressure it reads from an HP303B. It publishes in a seperate topic (Though you could probably publish all 3 readings together)
+//For this sketch to work correctly the PubSubClient.h must be modified. Change "#define MQTT_MAX_PACKET_SIZE 128" to "#define MQTT_MAX_PACKET_SIZE 256"
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 String MacAddress = WiFi.macAddress();
 char EndMac[5];
 char* roomName = "Bedroom"; //Dont make this longer than 25 chars
 char* pressureName = "House";
-const char* ssid = "WIFI NAME";
-const char* password = "WIFI PASS";
+const char* ssid = "Wifi SSID";
+const char* password = "WIFI PASSWORD";
+const char* mqttuser = "MQTT USER";
+const char* mqttpassword = "MQTT PASS";
 const int sleepTimeS = 300;
 SHT3X sht30(0x45);
 float curTemp;
 float curHumidity;
 char stateTopic[48]; //22 without room name
 char pressureStateTopic[48];
-char* mqttserver = "10.0.0.85";
+char* mqttserver = "MQTT SERVER";
 char MqttSend[50];
 LOLIN_HP303B HP303BPressureSensor;
 
@@ -41,7 +47,7 @@ void reconnect() {
     clientId += MacAddress.charAt(16);
     Serial.print(" with ClientID: " + clientId + "....");
      // Attempt to connect
-    if (client.connect(clientId.c_str())) {
+    if (client.connect((char*)clientId.c_str(),mqttuser,mqttpassword)) {
       Serial.println("connected");
       client.loop();
     } else {

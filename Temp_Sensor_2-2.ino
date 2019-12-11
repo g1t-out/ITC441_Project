@@ -3,7 +3,9 @@
 #include <PubSubClient.h>
 const char* ssid = "WIFI NAME";
 const char* password = "WIFI PASS";
-char* mqttserver = "192.168.5.31";
+char* mqttserver = "MQTT SERVER";
+//This is an early form of the Sketch. This only publishes temperature and humidity to seperate topics.
+
 
 WiFiClient espClient;
 PubSubClient client(espClient);
