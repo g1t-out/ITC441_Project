@@ -1,0 +1,33 @@
+- alias: StartupScripts
+  hide_entity: true
+  trigger:
+    - platform: homeassistant
+      event: start
+  action:
+    service: shell_command.scriptstartup
+- alias: notifyDeadSensor
+  hide_entity: true
+  trigger:
+    - platform: mqtt
+      topic: '/home/notify/deadsensor'
+  condition: []
+  action:
+    - service: notify.notify_sms
+      data_template:
+        title: "A Sensor Is Offline in Home Assistant"
+        message: " {{ trigger.payload }} "
+- alias: TemperatureNotifications
+  hide_entity: true
+  trigger:
+    - platform: numeric_state
+      entity_id:
+         - sensor.bedroom1_temp
+         - sensor.livingroom_temp
+         - sensor.masterbedroom_temp
+         - sensor.bedroom2_temp
+      below: 62
+  action:
+    - service: notify.notify_sms
+      data_template:
+        title: "Room Outside Temperature Boundaries"
+        message: "Room: {{trigger.to_state.entity_id }} Temp: {{trigger.to_state.state }} "
